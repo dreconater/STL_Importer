@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Unity STL Loader</title>
+    <script>
+      window.OpenFilePicker = function () {
+        var input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".stl";
+        input.onchange = function (event) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var base64 = e.target.result.split(",")[1];
+            unityInstance.SendMessage("WebGLStlLoader", "OnFileSelected", base64);
+          };
+          reader.readAsDataURL(event.target.files[0]);
+        };
+        input.click();
+      };
+    </script>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+      canvas { width: 100%; height: 100% }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas"></canvas>
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <script>
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "%UNITY_WEBGL_BUILD_URL%.data",
+        frameworkUrl: "%UNITY_WEBGL_BUILD_URL%.framework.js",
+        codeUrl: "%UNITY_WEBGL_BUILD_URL%.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "YourCompany",
+        productName: "STLLoader",
+        productVersion: "1.0",
+      }).then(function (instance) {
+        unityInstance = instance;
+      });
+    </script>
+    <button onclick="OpenFilePicker()" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">Upload STL</button>
+  </body>
+</html>
